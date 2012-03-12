@@ -1,0 +1,7 @@
+Vis (Trace Visualisation) is a final result of my dissertation. Its goal is to dynamically visualise what is happening inside of any program written in Java and to do it in safe and efficient manner. I aimed to provide a visualisation that, unlike class diagrams, is scalable, efficient and informative.
+
+For instructions on how to use it please refer to UserGuide.pdf.
+
+I spent just over two months (January 2011 to mid March 2011) writing the code of this program and have not touched it since… It's about time to share it with everyone and hope other people find it as useful as people that have evaluated it. Everyone is welcome to contribute to this project.
+
+My plans for near future are to refactor the code and use Maven for dependency management. While doing it my priorities will be to fix some bugs, provide tests and increase the efficiency.
