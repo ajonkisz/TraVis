@@ -6,8 +6,6 @@ import travis.util.Messages;
 
 public class PackageDialogPanel extends DialogPanel {
 
-	private static final long serialVersionUID = 7030713040914046613L;
-
 	public PackageDialogPanel() {
 		super();
 

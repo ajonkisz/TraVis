@@ -11,7 +11,6 @@ import travis.view.settings.Settings;
 
 public class Bspline {
 
-	private static final long serialVersionUID = 5088502861732263949L;
 	private static final int SEGMENTS = 16;
 	private static final double INTERVAL = 1d / (SEGMENTS - 1);
 	private static final int GRADIENT_DEPTH = 20;

@@ -12,7 +12,6 @@ import travis.util.Messages;
 
 public class MethodDialogPanel extends DialogPanel {
 
-	private static final long serialVersionUID = -3377322675280618257L;
 	private static final String STYLE = "<style type='text/css'>"
 			+ "table {background-color: #000000; padding: 1px 0px 0px 1px}"
 			+ "th {background-color: #ffffff; margin:0px 0.5px 0.5px 0px}"

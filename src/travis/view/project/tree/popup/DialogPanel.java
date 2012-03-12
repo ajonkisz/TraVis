@@ -12,8 +12,6 @@ import travis.model.project.StructStub;
 
 public abstract class DialogPanel {
 
-	private static final long serialVersionUID = -297606176170762799L;
-
 	private final JPanel panel; 
 	protected final StructStub stub;
 	protected final JTextField nameField;

@@ -27,7 +27,6 @@ public class Playback implements Attacher, Runnable {
 		PACKAGE, CLASS, METHOD
 	}
 
-	private static final long serialVersionUID = 4989826460595091553L;
 	private static final Pattern RETURN_CALL_PATTERN = Pattern.compile("-.*");
 
 	private volatile Mode mode;

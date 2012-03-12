@@ -8,8 +8,6 @@ import travis.util.Messages;
 
 public class ClassDialogPanel extends DialogPanel {
 
-	private static final long serialVersionUID = -1517247992375470390L;
-
 	private final JComboBox visibility;
 	private final JComboBox inheritance;
 
