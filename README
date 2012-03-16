@@ -1,3 +1,6 @@
+Just a little update to let everyone know that
+Just a little update to let everyone know that I'm planning to start working on this project next week. These are very early days of TraVis and you can expect lots of changes and better OS compatibility and integration. One of the first changes I will make is to include license where necessary. For the time being you should know that the license is GPL.
+
 TraVis (Trace Visualisation) is a final result of my dissertation. Its goal is to dynamically visualise what is happening inside of any program written in Java and to do it in safe and efficient manner. I aimed to provide a visualisation that, unlike class diagrams, is scalable, efficient and informative.
 
 For instructions on how to use it please refer to UserGuide.pdf.
