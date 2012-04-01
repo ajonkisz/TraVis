@@ -1,3 +1,24 @@
+/*
+ * Playback.java
+ *
+ * Copyright (C) 2011-2012, Artur Jonkisz, <travis.source@gmail.com>
+ *
+ * This file is part of TraVis.
+ * See https://github.com/ajonkisz/TraVis for more info.
+ *
+ * TraVis is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * TraVis is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with TraVis.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package travis.model.attach;
 
 import java.io.File;
@@ -20,291 +41,291 @@ import travis.model.script.TraceInfo;
 import travis.util.Messages;
 
 public class Playback implements Attacher, Runnable {
-	
-	private static final String DESCRIPTOR = "Playback";
 
-	public enum Mode {
-		PACKAGE, CLASS, METHOD
-	}
+    private static final String DESCRIPTOR = "Playback";
 
-	private static final Pattern RETURN_CALL_PATTERN = Pattern.compile("-.*");
+    public enum Mode {
+        PACKAGE, CLASS, METHOD
+    }
 
-	private volatile Mode mode;
-	private volatile Map<Integer, StructMethod> selectedIds;
+    private static final Pattern RETURN_CALL_PATTERN = Pattern.compile("-.*");
 
-	private final File script;
-	private final int tracesStart;
-	private final int tracesLength;
+    private volatile Mode mode;
+    private volatile Map<Integer, StructMethod> selectedIds;
 
-	private volatile double playbackStart;
-	private volatile double playbackEnd;
-	private volatile TraceInfo previousTrace;
-	private volatile LineNumberReader reader;
-	private volatile boolean needScannerRestart;
+    private final File script;
+    private final int tracesStart;
+    private final int tracesLength;
 
-	private final ExecutorService player;
-	private volatile boolean running;
-	private volatile boolean finished;
-	private volatile long wait;
+    private volatile double playbackStart;
+    private volatile double playbackEnd;
+    private volatile TraceInfo previousTrace;
+    private volatile LineNumberReader reader;
+    private volatile boolean needScannerRestart;
 
-	public Playback(FileParser fp) throws FileNotFoundException {
-		this.script = fp.getFile();
-		reader = new LineNumberReader(new FileReader(script));
+    private final ExecutorService player;
+    private volatile boolean running;
+    private volatile boolean finished;
+    private volatile long wait;
 
-		mode = Mode.METHOD;
-		selectedIds = Collections.emptyMap();
+    public Playback(FileParser fp) throws FileNotFoundException {
+        this.script = fp.getFile();
+        reader = new LineNumberReader(new FileReader(script));
 
-		tracesStart = fp.getTracesStart();
-		tracesLength = fp.getTracesLength();
+        mode = Mode.METHOD;
+        selectedIds = Collections.emptyMap();
 
-		playbackStart = 0d;
-		playbackEnd = 1d;
-		needScannerRestart = true;
+        tracesStart = fp.getTracesStart();
+        tracesLength = fp.getTracesLength();
 
-		player = Executors.newSingleThreadExecutor();
-		running = false;
-		finished = false;
-	}
-	
-	public File getScript() {
-		return script;
-	}
-	
-	public int getTracesStart() {
-		return tracesStart;
-	}
-	
-	public int getTracesLength() {
-		return tracesLength;
-	}
+        playbackStart = 0d;
+        playbackEnd = 1d;
+        needScannerRestart = true;
 
-	public boolean isFinished() {
-		return finished;
-	}
+        player = Executors.newSingleThreadExecutor();
+        running = false;
+        finished = false;
+    }
 
-	public Mode getMode() {
-		return mode;
-	}
+    public File getScript() {
+        return script;
+    }
 
-	public void setMode(Mode mode, Map<Integer, StructMethod> map) {
-		this.mode = mode;
-		this.selectedIds = map;
-	}
+    public int getTracesStart() {
+        return tracesStart;
+    }
 
-	public void setPlaybackStart(double playbackStart) {
-		if (playbackStart < 0 || playbackStart > 1)
-			throw new IllegalArgumentException(
-					Messages.get("playback.position.exception"));
-		this.playbackStart = playbackStart;
-		needScannerRestart = true;
-		if (!isRunning())
-			restartScanner();
-	}
+    public int getTracesLength() {
+        return tracesLength;
+    }
 
-	public void setPlaybackEnd(double playbackEnd) {
-		if (playbackEnd < 0 || playbackEnd > 1)
-			throw new IllegalArgumentException(
-					Messages.get("playback.position.exception"));
-		this.playbackEnd = playbackEnd;
-	}
+    public boolean isFinished() {
+        return finished;
+    }
 
-	public void setCurrentPos(double currentPos) {
-		if (currentPos < 0 || currentPos > 1)
-			throw new IllegalArgumentException(
-					Messages.get("playback.position.exception"));
-		previousTrace = null;
-		restartScannerToPosition((int) (tracesStart + tracesLength * currentPos));
-	}
+    public Mode getMode() {
+        return mode;
+    }
 
-	public void setCurvesPerSecond(int curvesNo) {
-		wait = 1000 / curvesNo;
-	}
+    public void setMode(Mode mode, Map<Integer, StructMethod> map) {
+        this.mode = mode;
+        this.selectedIds = map;
+    }
 
-	public double getCurrentPosPercent() {
-		if (reader.getLineNumber() <= tracesStart)
-			return 0d;
-		return (double) (reader.getLineNumber() - tracesStart + 1)
-				/ (tracesLength - 1);
-	}
+    public void setPlaybackStart(double playbackStart) {
+        if (playbackStart < 0 || playbackStart > 1)
+            throw new IllegalArgumentException(
+                    Messages.get("playback.position.exception"));
+        this.playbackStart = playbackStart;
+        needScannerRestart = true;
+        if (!isRunning())
+            restartScanner();
+    }
 
-	@Override
-	public void run() {
-		previousTrace = null;
-		while (running) {
-			try {
-				finished = false;
-				previousTrace = readNextCall(previousTrace);
-				Thread.sleep(wait);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    public void setPlaybackEnd(double playbackEnd) {
+        if (playbackEnd < 0 || playbackEnd > 1)
+            throw new IllegalArgumentException(
+                    Messages.get("playback.position.exception"));
+        this.playbackEnd = playbackEnd;
+    }
 
-	private TraceInfo readNextCall(TraceInfo previousTrace)
-			throws InterruptedException, IOException {
-		String line;
-		for (double posPc = getCurrentPosPercent(); (line = reader.readLine()) != null
-				&& posPc >= playbackStart && posPc <= playbackEnd; posPc = getCurrentPosPercent()) {
-			Scanner scanner = new Scanner(line);
-			boolean returnCall = scanner.hasNext(RETURN_CALL_PATTERN);
-			int methodId = Math.abs(scanner.nextInt());
-			long callTime = scanner.nextLong();
-			long threadId = scanner.nextLong();
+    public void setCurrentPos(double currentPos) {
+        if (currentPos < 0 || currentPos > 1)
+            throw new IllegalArgumentException(
+                    Messages.get("playback.position.exception"));
+        previousTrace = null;
+        restartScannerToPosition((int) (tracesStart + tracesLength * currentPos));
+    }
 
-			TraceInfo trace = new TraceInfo(methodId, returnCall, callTime,
-					threadId);
-			ScriptHandler.getInstance().sendTraceInfo(trace);
+    public void setCurvesPerSecond(int curvesNo) {
+        wait = 1000 / curvesNo;
+    }
 
-			if (mode == Mode.METHOD && returnFromMethod(trace, previousTrace)) {
-				return trace;
-			} else if (mode == Mode.CLASS
-					&& returnFromClass(trace, previousTrace)) {
-				return trace;
-			} else if (mode == Mode.PACKAGE
-					&& returnFromPackage(trace, previousTrace)) {
-				return trace;
-			}
-		}
+    public double getCurrentPosPercent() {
+        if (reader.getLineNumber() <= tracesStart)
+            return 0d;
+        return (double) (reader.getLineNumber() - tracesStart + 1)
+                / (tracesLength - 1);
+    }
 
-		// Can get to here only if did not return.
-		needScannerRestart = true;
-		running = false;
-		finished = true;
-		Thread.sleep(50);
-		ScriptHandler.getInstance().sendEmptyCall();
+    @Override
+    public void run() {
+        previousTrace = null;
+        while (running) {
+            try {
+                finished = false;
+                previousTrace = readNextCall(previousTrace);
+                Thread.sleep(wait);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-		return previousTrace;
-	}
+    private TraceInfo readNextCall(TraceInfo previousTrace)
+            throws InterruptedException, IOException {
+        String line;
+        for (double posPc = getCurrentPosPercent(); (line = reader.readLine()) != null
+                && posPc >= playbackStart && posPc <= playbackEnd; posPc = getCurrentPosPercent()) {
+            Scanner scanner = new Scanner(line);
+            boolean returnCall = scanner.hasNext(RETURN_CALL_PATTERN);
+            int methodId = Math.abs(scanner.nextInt());
+            long callTime = scanner.nextLong();
+            long threadId = scanner.nextLong();
 
-	private boolean returnFromMethod(TraceInfo trace, TraceInfo previousTrace) {
-		if (trace.isReturnCall() && previousTrace == null)
-			return false;
-		return selectedIds.containsKey(trace.getMethodId());
-	}
+            TraceInfo trace = new TraceInfo(methodId, returnCall, callTime,
+                    threadId);
+            ScriptHandler.getInstance().sendTraceInfo(trace);
 
-	private boolean returnFromClass(TraceInfo trace, TraceInfo previousTrace) {
-		if (trace.isReturnCall() && previousTrace == null)
-			return false;
+            if (mode == Mode.METHOD && returnFromMethod(trace, previousTrace)) {
+                return trace;
+            } else if (mode == Mode.CLASS
+                    && returnFromClass(trace, previousTrace)) {
+                return trace;
+            } else if (mode == Mode.PACKAGE
+                    && returnFromPackage(trace, previousTrace)) {
+                return trace;
+            }
+        }
 
-		StructMethod currentMethod = selectedIds.get(trace.getMethodId());
-		if (previousTrace == null)
-			return currentMethod != null;
+        // Can get to here only if did not return.
+        needScannerRestart = true;
+        running = false;
+        finished = true;
+        Thread.sleep(50);
+        ScriptHandler.getInstance().sendEmptyCall();
 
-		StructMethod previousMethod = selectedIds.get(previousTrace
-				.getMethodId());
-		if (currentMethod == null || previousMethod == null)
-			return false;
+        return previousTrace;
+    }
 
-		return !currentMethod.getParent().equals(previousMethod.getParent());
-	}
+    private boolean returnFromMethod(TraceInfo trace, TraceInfo previousTrace) {
+        if (trace.isReturnCall() && previousTrace == null)
+            return false;
+        return selectedIds.containsKey(trace.getMethodId());
+    }
 
-	private boolean returnFromPackage(TraceInfo trace, TraceInfo previousTrace) {
-		if (trace.isReturnCall() && previousTrace == null)
-			return false;
+    private boolean returnFromClass(TraceInfo trace, TraceInfo previousTrace) {
+        if (trace.isReturnCall() && previousTrace == null)
+            return false;
 
-		StructMethod currentMethod = selectedIds.get(trace.getMethodId());
-		if (previousTrace == null)
-			return currentMethod != null;
+        StructMethod currentMethod = selectedIds.get(trace.getMethodId());
+        if (previousTrace == null)
+            return currentMethod != null;
 
-		StructMethod previousMethod = selectedIds.get(previousTrace
-				.getMethodId());
-		if (currentMethod == null || previousMethod == null)
-			return false;
+        StructMethod previousMethod = selectedIds.get(previousTrace
+                .getMethodId());
+        if (currentMethod == null || previousMethod == null)
+            return false;
 
-		StructComponent pckg = currentMethod.getParent().getParent();
-		StructComponent previousPckg = previousMethod.getParent().getParent();
+        return !currentMethod.getParent().equals(previousMethod.getParent());
+    }
 
-		if ((pckg == null && previousPckg != null)
-				|| (previousPckg == null && pckg != null))
-			return true;
+    private boolean returnFromPackage(TraceInfo trace, TraceInfo previousTrace) {
+        if (trace.isReturnCall() && previousTrace == null)
+            return false;
 
-		return !pckg.equals(previousPckg);
-	}
+        StructMethod currentMethod = selectedIds.get(trace.getMethodId());
+        if (previousTrace == null)
+            return currentMethod != null;
 
-	@Override
-	public void detach() {
-		stop();
-	}
+        StructMethod previousMethod = selectedIds.get(previousTrace
+                .getMethodId());
+        if (currentMethod == null || previousMethod == null)
+            return false;
 
-	@Override
-	public void start() {
-		player.submit(this);
-	}
+        StructComponent pckg = currentMethod.getParent().getParent();
+        StructComponent previousPckg = previousMethod.getParent().getParent();
 
-	private void restartScanner() {
-		if (needScannerRestart) {
-			int end = (int) (tracesStart + tracesLength * playbackStart);
-			configureCurrentPos(end);
-		}
-	}
+        if ((pckg == null && previousPckg != null)
+                || (previousPckg == null && pckg != null))
+            return true;
 
-	private void restartScannerToPosition(int position) {
-		boolean playing = isRunning();
-		configureCurrentPos(position);
-		if (playing)
-			play();
-	}
+        return !pckg.equals(previousPckg);
+    }
 
-	private void configureCurrentPos(int position) {
-		running = false;
+    @Override
+    public void detach() {
+        stop();
+    }
 
-		if (reader.getLineNumber() >= position) {
-			try {
-				reader = new LineNumberReader(new FileReader(script));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
+    @Override
+    public void start() {
+        player.submit(this);
+    }
 
-		while (reader.getLineNumber() < position) {
-			try {
-				reader.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+    private void restartScanner() {
+        if (needScannerRestart) {
+            int end = (int) (tracesStart + tracesLength * playbackStart);
+            configureCurrentPos(end);
+        }
+    }
 
-		needScannerRestart = false;
-		ScriptHandler.getInstance().sendEmptyCall();
-	}
+    private void restartScannerToPosition(int position) {
+        boolean playing = isRunning();
+        configureCurrentPos(position);
+        if (playing)
+            play();
+    }
 
-	public void play() {
-		restartScanner();
-		running = true;
-		start();
-	}
+    private void configureCurrentPos(int position) {
+        running = false;
 
-	public void pause() {
-		running = false;
-	}
+        if (reader.getLineNumber() >= position) {
+            try {
+                reader = new LineNumberReader(new FileReader(script));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
 
-	public void stop() {
-		pause();
-		needScannerRestart = true;
-		restartScanner();
-	}
+        while (reader.getLineNumber() < position) {
+            try {
+                reader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-	@Override
-	public boolean isRunning() {
-		return running;
-	}
+        needScannerRestart = false;
+        ScriptHandler.getInstance().sendEmptyCall();
+    }
 
-	@Override
-	public String getPid() {
-		return "?";
-	}
+    public void play() {
+        restartScanner();
+        running = true;
+        start();
+    }
 
-	@Override
-	public String getName() {
-		return script.getName();
-	}
+    public void pause() {
+        running = false;
+    }
 
-	@Override
-	public String getDescriptor() {
-		return DESCRIPTOR;
-	}
+    public void stop() {
+        pause();
+        needScannerRestart = true;
+        restartScanner();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public String getPid() {
+        return "?";
+    }
+
+    @Override
+    public String getName() {
+        return script.getName();
+    }
+
+    @Override
+    public String getDescriptor() {
+        return DESCRIPTOR;
+    }
 
 }

@@ -1,10 +1,30 @@
+/*
+ * PlaybackPanel.java
+ *
+ * Copyright (C) 2011-2012, Artur Jonkisz, <travis.source@gmail.com>
+ *
+ * This file is part of TraVis.
+ * See https://github.com/ajonkisz/TraVis for more info.
+ *
+ * TraVis is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * TraVis is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with TraVis.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package travis.view.playback;
 
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
-
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -20,142 +40,142 @@ import travis.view.settings.Settings;
 
 public class PlaybackPanel extends JPanel implements ActionListener {
 
-	private static final long serialVersionUID = -9083678108698554427L;
+    private static final long serialVersionUID = -9083678108698554427L;
 
-	private Playback playback;
-	private final JButton playButton;
-	private final JButton pauseButton;
-	private final JButton stopButton;
-	private final PlaybackProgress progress;
-	private volatile JButton activeButton;
+    private Playback playback;
+    private final JButton playButton;
+    private final JButton pauseButton;
+    private final JButton stopButton;
+    private final PlaybackProgress progress;
+    private volatile JButton activeButton;
 
-	public PlaybackPanel() {
-		super(new MigLayout("aligny center, alignx center, insets 0"));
+    public PlaybackPanel() {
+        super(new MigLayout("aligny center, alignx center, insets 0"));
 
-		playButton = Util.getButtonWithIcon("playSmall32");
-		playButton.addActionListener(this);
-		pauseButton = Util.getButtonWithIcon("pauseSmall32");
-		pauseButton.addActionListener(this);
-		stopButton = Util.getButtonWithIcon("stopSmall32");
-		stopButton.addActionListener(this);
+        playButton = Util.getButtonWithIcon("playSmall32");
+        playButton.addActionListener(this);
+        pauseButton = Util.getButtonWithIcon("pauseSmall32");
+        pauseButton.addActionListener(this);
+        stopButton = Util.getButtonWithIcon("stopSmall32");
+        stopButton.addActionListener(this);
 
-		add(playButton, "cell 0 0");
-		activeButton = playButton;
-		add(stopButton, "cell 1 0");
+        add(playButton, "cell 0 0");
+        activeButton = playButton;
+        add(stopButton, "cell 1 0");
 
-		progress = new PlaybackProgress(this);
-		add(progress, "cell 2 0, w 90%, grow");
-	}
+        progress = new PlaybackProgress(this);
+        add(progress, "cell 2 0, w 90%, grow");
+    }
 
-	public PlaybackProgress getPlaybackProgress() {
-		return progress;
-	}
+    public PlaybackProgress getPlaybackProgress() {
+        return progress;
+    }
 
-	@Override
-	public void setEnabled(boolean enabled) {
-		super.setEnabled(enabled);
-		activeButton.setEnabled(enabled);
-		stopButton.setEnabled(enabled);
-		progress.setVisible(enabled);
-	}
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        activeButton.setEnabled(enabled);
+        stopButton.setEnabled(enabled);
+        progress.setVisible(enabled);
+    }
 
-	public Playback getPlayback() {
-		return playback;
-	}
+    public Playback getPlayback() {
+        return playback;
+    }
 
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		progress.repaint();
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        progress.repaint();
 
-		if (playback != null && !playback.isRunning()
-				&& activeButton == pauseButton)
-			togglePlayPause(pauseButton, playButton);
-	}
+        if (playback != null && !playback.isRunning()
+                && activeButton == pauseButton)
+            togglePlayPause(pauseButton, playButton);
+    }
 
-	public void play() {
-		togglePlayPause(playButton, pauseButton);
-		if (playback != null) {
-			if (playback.isFinished())
-				UIGraphicsHelper.getInstance()
-						.resetConnectionsAndRepaintGraph();
+    public void play() {
+        togglePlayPause(playButton, pauseButton);
+        if (playback != null) {
+            if (playback.isFinished())
+                UIGraphicsHelper.getInstance()
+                        .resetConnectionsAndRepaintGraph();
 
-			updatePlaybackSpeed();
-			updatePlaybackMode(false);
-			playback.play();
-		}
-	}
+            updatePlaybackSpeed();
+            updatePlaybackMode(false);
+            playback.play();
+        }
+    }
 
-	public void updatePlaybackSpeed() {
-		if (playback != null) {
-			playback.setCurvesPerSecond(Settings.getInstance()
-					.getCurvesPerSec());
-		}
-	}
+    public void updatePlaybackSpeed() {
+        if (playback != null) {
+            playback.setCurvesPerSecond(Settings.getInstance()
+                    .getCurvesPerSec());
+        }
+    }
 
-	public void updatePlaybackMode() {
-		updatePlaybackMode(true);
-	}
+    public void updatePlaybackMode() {
+        updatePlaybackMode(true);
+    }
 
-	private void updatePlaybackMode(boolean force) {
-		if (playback != null) {
-			Mode mode = Mode.PACKAGE;
-			if (Settings.getInstance().isDrawingStruct(Settings.STRUCT_METHOD)) {
-				mode = Mode.METHOD;
-			} else if (Settings.getInstance().isDrawingStruct(
-					Settings.STRUCT_CLASS)) {
-				mode = Mode.CLASS;
-			}
+    private void updatePlaybackMode(boolean force) {
+        if (playback != null) {
+            Mode mode = Mode.PACKAGE;
+            if (Settings.getInstance().isDrawingStruct(Settings.STRUCT_METHOD)) {
+                mode = Mode.METHOD;
+            } else if (Settings.getInstance().isDrawingStruct(
+                    Settings.STRUCT_CLASS)) {
+                mode = Mode.CLASS;
+            }
 
-			if (mode != playback.getMode() || force) {
-				playback.setMode(mode, UIHelper.getInstance().getProjectTree()
-						.getSelectedMethodsIds());
-			}
-		}
-	}
+            if (mode != playback.getMode() || force) {
+                playback.setMode(mode, UIHelper.getInstance().getProjectTree()
+                        .getSelectedMethodsIds());
+            }
+        }
+    }
 
-	public void pause() {
-		togglePlayPause(pauseButton, playButton);
-		if (playback != null)
-			playback.pause();
-	}
+    public void pause() {
+        togglePlayPause(pauseButton, playButton);
+        if (playback != null)
+            playback.pause();
+    }
 
-	private void togglePlayPause(JButton from, JButton to) {
-		remove(from);
-		add(to, "cell 0 0");
-		to.requestFocusInWindow();
-		activeButton = to;
-		validate();
-	}
+    private void togglePlayPause(JButton from, JButton to) {
+        remove(from);
+        add(to, "cell 0 0");
+        to.requestFocusInWindow();
+        activeButton = to;
+        validate();
+    }
 
-	public void stop() {
-		pause();
-		if (playback != null)
-			playback.stop();
-		UIGraphicsHelper.getInstance().resetConnectionsAndRepaintGraph();
-	}
+    public void stop() {
+        pause();
+        if (playback != null)
+            playback.stop();
+        UIGraphicsHelper.getInstance().resetConnectionsAndRepaintGraph();
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource().equals(playButton)) {
-			play();
-		} else if (e.getSource().equals(pauseButton)) {
-			pause();
-		} else if (e.getSource().equals(stopButton)) {
-			stop();
-		}
-	}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(playButton)) {
+            play();
+        } else if (e.getSource().equals(pauseButton)) {
+            pause();
+        } else if (e.getSource().equals(stopButton)) {
+            stop();
+        }
+    }
 
-	public void setFileParser(FileParser fp) {
-		try {
-			playback = AttacherFactory.newAttacher(fp);
-			UIHelper.getInstance().startAttacher(playback);
-			updatePlaybackMode(true);
-			progress.setupPlaybackGraph(fp.getDepths(), fp.getMaxDepth());
-			progress.resetPlaybackRange();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+    public void setFileParser(FileParser fp) {
+        try {
+            playback = AttacherFactory.newAttacher(fp);
+            UIHelper.getInstance().startAttacher(playback);
+            updatePlaybackMode(true);
+            progress.setupPlaybackGraph(fp.getDepths(), fp.getMaxDepth());
+            progress.resetPlaybackRange();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
