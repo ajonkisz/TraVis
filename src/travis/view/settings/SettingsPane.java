@@ -35,11 +35,6 @@ public class SettingsPane extends JTabbedPane implements Observer {
 
     private static final Settings SETS = Settings.getInstance();
 
-    private final SettingsTab visibilityPanel;
-    private final SettingsTab layersPanel;
-    private final SettingsTab graphPanel;
-    private final SettingsTab tracesPanel;
-    private final SettingsTab colorsPanel;
     private final Set<SettingsTab> tabs;
 
     public SettingsPane() {
@@ -47,11 +42,11 @@ public class SettingsPane extends JTabbedPane implements Observer {
 
         tabs = new HashSet<SettingsTab>();
 
-        visibilityPanel = new VisibilityPanel();
-        layersPanel = new LayersPanel();
-        graphPanel = new GraphPanel();
-        tracesPanel = new TracesPanel();
-        colorsPanel = new ColorsPanel();
+        SettingsTab visibilityPanel = new VisibilityPanel();
+        SettingsTab layersPanel = new LayersPanel();
+        SettingsTab graphPanel = new GraphPanel();
+        SettingsTab tracesPanel = new TracesPanel();
+        SettingsTab colorsPanel = new ColorsPanel();
 
         addTab(Messages.get("visibility"), visibilityPanel);
         tabs.add(visibilityPanel);

@@ -242,7 +242,7 @@ public class Playback implements Attacher, Runnable {
                 || (previousPckg == null && pckg != null))
             return true;
 
-        return !pckg.equals(previousPckg);
+        return pckg != null && !pckg.equals(previousPckg);
     }
 
     @Override

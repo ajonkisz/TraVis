@@ -83,10 +83,6 @@ public class ScriptHandler extends Observable {
         }
     }
 
-    public void saveToFile(File dest) throws IOException {
-        saveToFile(dest, null);
-    }
-
     public void saveToFile(File dest, TreePath[] treePathToWrite)
             throws IOException {
         synchronized (outputFile) {
@@ -107,7 +103,7 @@ public class ScriptHandler extends Observable {
                                 String nanoTime, String threadId) {
         try {
             FileWriter oldFw = fw;
-            TraceInfo trace = null;
+            TraceInfo trace;
             synchronized (outputFile) {
                 // Check if created a new FileOutputStream if so do not write
                 // anything to a newly created file - discard input.

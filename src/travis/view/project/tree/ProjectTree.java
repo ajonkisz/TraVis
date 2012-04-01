@@ -208,7 +208,7 @@ public class ProjectTree implements ChangeListener {
     private void restoreExpandedPaths(Enumeration<TreePath> expanded) {
         if (expanded != null) {
             while (expanded.hasMoreElements()) {
-                TreePath treePath = (TreePath) expanded.nextElement();
+                TreePath treePath = expanded.nextElement();
                 tree.expandPath(treePath);
             }
         }

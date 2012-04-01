@@ -102,7 +102,7 @@ public class AttacherPanel extends JPanel implements ActionListener {
 
         Object[] possibilities = processes.toArray();
         JavaProcess jp = (JavaProcess) JOptionPane.showInputDialog(UIHelper
-                .getInstance().getMainFrame(), Messages.get("process.choose"),
+                .getInstance().getMainFrame(), Messages.get("process.choose") + '\n',
                 Messages.get("process"), JOptionPane.PLAIN_MESSAGE, null,
                 possibilities, possibilities[0]);
 

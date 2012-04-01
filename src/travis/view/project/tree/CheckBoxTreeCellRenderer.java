@@ -74,7 +74,6 @@ public class CheckBoxTreeCellRenderer implements TreeCellRenderer {
     private final JCheckBox checkBox;
     private final Set<TreePath> checkedPaths;
     private final JTree tree;
-    private Point mouseLocation;
     private int mouseRow = -1;
     private int pressedRow = -1;
     private boolean mouseInCheck;
@@ -148,15 +147,14 @@ public class CheckBoxTreeCellRenderer implements TreeCellRenderer {
         if (mouseRow != -1) {
             repaint(mouseRow);
         }
-        mouseLocation = newLoc;
-        if (mouseLocation != null) {
+        if (newLoc != null) {
             mouseRow = getRow(newLoc);
             repaint(mouseRow);
         } else {
             mouseRow = -1;
         }
-        if (mouseRow != -1 && mouseLocation != null) {
-            Point mouseLoc = new Point(mouseLocation);
+        if (mouseRow != -1 && newLoc != null) {
+            Point mouseLoc = new Point(newLoc);
             Rectangle r = getRowBounds(mouseRow);
             if (r != null)
                 mouseLoc.x -= r.x;
@@ -297,11 +295,7 @@ public class CheckBoxTreeCellRenderer implements TreeCellRenderer {
         if (isExplicitlyChecked(path)) {
             return true;
         } else {
-            if (path.getParentPath() != null) {
-                return isChecked(path.getParentPath());
-            } else {
-                return false;
-            }
+            return path.getParentPath() != null && isChecked(path.getParentPath());
         }
     }
 
@@ -377,7 +371,7 @@ public class CheckBoxTreeCellRenderer implements TreeCellRenderer {
 
     private void removeChildren(TreePath parent) {
         for (Iterator<TreePath> i = checkedPaths.iterator(); i.hasNext(); ) {
-            TreePath p = (TreePath) i.next();
+            TreePath p = i.next();
             if (p.getParentPath() != null && parent.equals(p.getParentPath())) {
                 i.remove();
             }
@@ -386,7 +380,7 @@ public class CheckBoxTreeCellRenderer implements TreeCellRenderer {
 
     private void removeDescendants(TreePath ancestor) {
         for (Iterator<TreePath> i = checkedPaths.iterator(); i.hasNext(); ) {
-            TreePath path = (TreePath) i.next();
+            TreePath path = i.next();
             if (ancestor.isDescendant(path)) {
                 i.remove();
             }
@@ -410,7 +404,7 @@ public class CheckBoxTreeCellRenderer implements TreeCellRenderer {
      * Returns all checked paths.
      */
     public TreePath[] getCheckedPaths() {
-        return (TreePath[]) checkedPaths.toArray(new TreePath[checkedPaths
+        return checkedPaths.toArray(new TreePath[checkedPaths
                 .size()]);
     }
 

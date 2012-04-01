@@ -96,14 +96,4 @@ public class ControlPoint extends Point {
         populatePath(path, cp.getParentPoint(), ++i);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
 }

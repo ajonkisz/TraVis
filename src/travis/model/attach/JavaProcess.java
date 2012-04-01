@@ -60,7 +60,7 @@ public class JavaProcess implements Comparable<JavaProcess> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof JavaProcess) {
-            return compareTo((JavaProcess) obj) == 0 ? true : false;
+            return compareTo((JavaProcess) obj) == 0;
         }
         return false;
     }

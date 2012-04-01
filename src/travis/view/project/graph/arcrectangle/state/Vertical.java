@@ -34,7 +34,7 @@ import travis.view.project.graph.arcrectangle.LabelledArcRectangle;
 
 public class Vertical extends TextOrientationState {
 
-    private Line2D textLine;
+    private final Line2D textLine;
 
     protected Vertical(LabelledArcRectangle rect, Font font) {
         super(rect, font);
@@ -104,9 +104,8 @@ public class Vertical extends TextOrientationState {
     private double getRadiusToCenter() {
         Point2D start = isFlipped() ? textLine.getP2() : textLine.getP1();
         double freeSpace = (getPathLength() - textWidth) / 2;
-        double r = start.distance(rect.getCircleCenterX(), rect.getCircleCenterY())
+        return start.distance(rect.getCircleCenterX(), rect.getCircleCenterY())
                 + freeSpace;
-        return r;
     }
 
     @Override

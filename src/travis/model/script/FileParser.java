@@ -32,15 +32,12 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.tree.TreePath;
 
 import travis.model.project.StructStub;
-import travis.model.project.structure.StructClass;
 import travis.model.project.structure.StructComponent;
-import travis.model.project.structure.StructMethod;
 import travis.model.project.structure.StructPackage;
 import travis.view.project.tree.ProjectTreeNode;
 
@@ -84,10 +81,6 @@ public class FileParser {
             if (m.matches())
                 break;
         }
-
-        // This got replaced by serialization
-        // root = (new Builder()).build();
-        // parseHeader(new Scanner(file));
 
         tracesStart = lnr.getLineNumber();
 
@@ -136,73 +129,15 @@ public class FileParser {
         return file;
     }
 
-    // This got replaced by serialization, but is left for reference.
-    @SuppressWarnings("unused")
-    private int parseHeader(Scanner sc) throws IOException {
-        sc.findWithinHorizon(ScriptHandler.TREEPATHS_TERMINATING_SEQUENCE, 0);
-        sc.nextLine();
-
-        int i = 1;
-        try {
-            while (!sc.hasNext(ScriptHandler.HEADER_TERMINATING_SEQUENCE)) {
-                i++;
-                sc.nextInt();
-                String className = sc.next();
-                int classAccessFlag = sc.nextInt();
-                String methodName = sc.next();
-                String methodDescriptor = sc.next();
-                int methodAccessFlag = sc.nextInt();
-
-                StructStub classStub = new StructStub(className);
-                classStub.setAccessFlag(classAccessFlag);
-                StructClass methodParent = getMethodParentForClassStub(classStub);
-
-                StructStub methodStub = new StructStub(methodName);
-                methodStub.setAccessFlag(methodAccessFlag);
-                methodStub.setDescriptor(methodDescriptor);
-                methodParent.addStructComponent(new StructMethod(methodParent,
-                        methodStub));
-            }
-            if (i != 1) {
-                // Consume end of the line
-                sc.nextLine();
-                // Consume HEADER_TERMINATING_SEQUENCE
-                sc.nextLine();
-            }
-        } catch (Exception e) {
-            System.err.println("Problem with parsing traces in "
-                    + file.getName() + " file");
-        }
-        return i;
-    }
-
-    private StructClass getMethodParentForClassStub(StructStub stub) {
-        StructComponent packageParent = buildPackagePathForClassName(stub
-                .getName());
-        StructClass structClass = new StructClass(packageParent, stub);
-
-        StructComponent foundChild = packageParent.getChild(structClass);
-        StructClass methodParent;
-        if (foundChild != null) {
-            methodParent = (StructClass) foundChild;
-        } else {
-            packageParent.addStructComponent(structClass);
-            methodParent = structClass;
-        }
-
-        return methodParent;
-    }
-
     private StructComponent buildPackagePathForClassName(String className) {
         String[] packages = getPackagesForClassName(className);
         StructComponent parent = root;
-        for (int i = 0; i < packages.length; i++) {
-            StructStub stub = new StructStub(packages[i]);
+        for (String aPackage : packages) {
+            StructStub stub = new StructStub(aPackage);
             StructPackage structPackage = new StructPackage(parent, stub);
             StructComponent foundChild;
             if ((foundChild = parent.getChild(structPackage)) != null) {
                 parent = foundChild;
-                continue;
             } else {
                 parent.addStructComponent(structPackage);
                 parent = structPackage;
@@ -213,12 +148,8 @@ public class FileParser {
 
     private String[] getPackagesForClassName(String className) {
         String[] packages = className.split("\\.");
-        for (int i = 0; i < packages.length - 1; i++) {
-            if (i == 0) {
-                continue;
-            } else {
-                packages[i] = packages[i - 1] + '.' + packages[i];
-            }
+        for (int i = 1; i < packages.length - 1; i++) {
+            packages[i] = packages[i - 1] + '.' + packages[i];
         }
         return Arrays.copyOf(packages, packages.length - 1);
     }

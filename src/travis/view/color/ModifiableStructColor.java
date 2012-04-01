@@ -25,15 +25,6 @@ import java.awt.Color;
 
 public abstract class ModifiableStructColor extends StructColor {
 
-    public static final ModifiableStructColor getModifiableColor() {
-        return new ModifiableColor();
-    }
-
-    public static final ModifiableStructColor getModifiableColor(
-            StructColor color) {
-        return new ModifiableColor(color);
-    }
-
     public void setColors(StructColor color) {
         setPackageColor(color.getPackageColor());
         setOrdinaryClassColor(color.getOrdinaryClassColor());

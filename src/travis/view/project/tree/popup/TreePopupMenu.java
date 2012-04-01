@@ -159,6 +159,9 @@ public class TreePopupMenu extends JPopupMenu implements ActionListener,
             @Override
             public void act() {
                 TreePath[] paths = tree.getSelectionPaths();
+                if (paths == null) {
+                    return;
+                }
                 for (TreePath path : paths) {
                     ProjectTreeNode parent = (ProjectTreeNode) path
                             .getParentPath().getLastPathComponent();

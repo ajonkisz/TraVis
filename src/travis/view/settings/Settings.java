@@ -136,53 +136,43 @@ public class Settings extends Observable {
     }
 
     public boolean isDrawingClass(StructComponent comp) {
-        if (comp instanceof StructClass) {
-            if (comp.isOrdinaryClass()
-                    && isDrawingStruct(STRUCT_ORDINARY_CLASS)) {
-                return true;
-            }
-            if (comp.isInterface() && isDrawingStruct(STRUCT_INTERFACE)) {
-                return true;
-            }
-            // This extra check must be here as according to ASM and interface
-            // is also an abstract class.
-            if (comp.isInterface() && !isDrawingStruct(STRUCT_INTERFACE)) {
-                return false;
-            }
-            if (comp.isAbstract() && isDrawingStruct(STRUCT_ABSTRACT_CLASS)) {
-                return true;
-            }
-            if (comp.isEnum() && isDrawingStruct(STRUCT_ENUM)) {
-                return true;
-            }
-            return false;
-        } else {
+        if (!(comp instanceof StructClass)) return true;
+
+        if (comp.isOrdinaryClass()
+                && isDrawingStruct(STRUCT_ORDINARY_CLASS)) {
             return true;
         }
+        else if (comp.isInterface() && isDrawingStruct(STRUCT_INTERFACE)) {
+            return true;
+        }
+        // This extra check must be here as according to ASM and interface
+        // is also an abstract class.
+        else if (comp.isInterface() && !isDrawingStruct(STRUCT_INTERFACE)) {
+            return false;
+        }
+        else if (comp.isAbstract() && isDrawingStruct(STRUCT_ABSTRACT_CLASS)) {
+            return true;
+        }
+        else return comp.isEnum() && isDrawingStruct(STRUCT_ENUM);
     }
 
     public boolean isDrawingMethod(StructComponent comp) {
-        if (comp instanceof StructMethod) {
-            if (comp.getVisibility() == Visibility.PUBLIC
-                    && isDrawingStruct(STRUCT_PUBLIC_METHOD)) {
-                return true;
-            }
-            if (comp.getVisibility() == Visibility.PRIVATE
-                    && isDrawingStruct(STRUCT_PRIVATE_METHOD)) {
-                return true;
-            }
-            if (comp.getVisibility() == Visibility.PROTECTED
-                    && isDrawingStruct(STRUCT_PROTECTED_METHOD)) {
-                return true;
-            }
-            if (comp.getVisibility() == Visibility.DEFAULT
-                    && isDrawingStruct(STRUCT_DEFAULT_METHOD)) {
-                return true;
-            }
-            return false;
-        } else {
+        if (!(comp instanceof StructMethod)) return true;
+
+        if (comp.getVisibility() == Visibility.PUBLIC
+                && isDrawingStruct(STRUCT_PUBLIC_METHOD)) {
             return true;
         }
+        else if (comp.getVisibility() == Visibility.PRIVATE
+                && isDrawingStruct(STRUCT_PRIVATE_METHOD)) {
+            return true;
+        }
+        else if (comp.getVisibility() == Visibility.PROTECTED
+                && isDrawingStruct(STRUCT_PROTECTED_METHOD)) {
+            return true;
+        }
+        else return comp.getVisibility() == Visibility.DEFAULT
+                && isDrawingStruct(STRUCT_DEFAULT_METHOD);
     }
 
     public boolean isDrawingStruct(StructComponent comp) {
@@ -202,10 +192,7 @@ public class Settings extends Observable {
             if (comp.isInterface() && isDrawingStruct(STRUCT_INTERFACE)) {
                 return true;
             }
-            if (comp.isEnum() && isDrawingStruct(STRUCT_ENUM)) {
-                return true;
-            }
-            return false;
+            return comp.isEnum() && isDrawingStruct(STRUCT_ENUM);
         } else if (comp instanceof StructMethod) {
             if (!isDrawingStruct(STRUCT_METHOD)) {
                 return false;
@@ -222,11 +209,8 @@ public class Settings extends Observable {
                     && isDrawingStruct(STRUCT_PROTECTED_METHOD)) {
                 return true;
             }
-            if (comp.getVisibility() == Visibility.DEFAULT
-                    && isDrawingStruct(STRUCT_DEFAULT_METHOD)) {
-                return true;
-            }
-            return false;
+            return comp.getVisibility() == Visibility.DEFAULT
+                    && isDrawingStruct(STRUCT_DEFAULT_METHOD);
         } else {
             return true;
         }
@@ -301,7 +285,7 @@ public class Settings extends Observable {
     public void setCurveBundlingStrength(double curveBundlingStrength) {
         if (curveBundlingStrength < 0 || curveBundlingStrength > 1)
             throw new IllegalArgumentException(
-                    Messages.get("budling.strength.exception"));
+                    Messages.get("bundling.strength.exception"));
         this.curveBundlingStrength = curveBundlingStrength;
         setChanged(Type.GRAPH_CONNECTION);
     }

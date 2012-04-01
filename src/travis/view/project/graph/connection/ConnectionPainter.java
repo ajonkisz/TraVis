@@ -104,7 +104,6 @@ public class ConnectionPainter {
             if (trace.isReturnCall()) {
                 if (cpStart == null) {
                     createConnections(null, null, it, data, false);
-                    continue;
                 } else {
                     return;
                 }
@@ -117,7 +116,6 @@ public class ConnectionPainter {
                     cpStart = cpEnd;
                     previousTrace = trace;
                     createConnections(cpStart, trace, it, data, false);
-                    continue;
                 } else {
                     // The commented out part causes graph to not be drawn correctly
                     // TODO All threads should be drawn separately from a different collection
@@ -131,7 +129,6 @@ public class ConnectionPainter {
                             trace, path);
                     data.addSpline(spline);
                     createConnections(cpEnd, trace, it, data, false);
-                    continue;
                 }
             }
         }
@@ -247,9 +244,9 @@ public class ConnectionPainter {
     }
 
     private class ConnectionData {
-        private Collection<GraphBspline> splines;
+        private final Collection<GraphBspline> splines;
         private boolean finishedOnReturn;
-        private ExecutionPoint ep;
+        private final ExecutionPoint ep;
         private final boolean ignoreOldTraces;
 
         public ConnectionData() {

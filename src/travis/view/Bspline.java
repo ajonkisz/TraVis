@@ -73,9 +73,11 @@ public class Bspline {
         }
     }
 
-    private int[] pX, pY;
-    private double[] dx, dy;
-    private int n;
+    private final int[] pX;
+    private final int[] pY;
+    private final double[] dx;
+    private final double[] dy;
+    private final int n;
     private int[] txPts;
     private int[] tyPts;
 
@@ -169,8 +171,8 @@ public class Bspline {
         int total = (n - 1) * SEGMENTS;
         txPts = new int[total + 1];
         tyPts = new int[total + 1];
-        txPts[0] = (int) pX[0];
-        tyPts[0] = (int) pY[0];
+        txPts[0] = pX[0];
+        tyPts[0] = pY[0];
 
         int counter = 0;
         int previousGradIndex = 0;

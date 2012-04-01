@@ -48,20 +48,6 @@ public class ProjectTreeNode extends DefaultMutableTreeNode implements
         }
     }
 
-    public ProjectTreeNode find(StructComponent element) {
-        if (root.equals(element))
-            return this;
-
-        Enumeration<ProjectTreeNode> children = depthFirstEnumeration();
-        while (children.hasMoreElements()) {
-            ProjectTreeNode child = children.nextElement();
-            if (child.getChildCount() == 0
-                    && child.getUserObject().equals(element))
-                return child;
-        }
-        return null;
-    }
-
     public static ProjectTreeNode findMethod(ProjectTreeNode root,
                                              StructMethod method) {
         if (root.getUserObject().equals(method))
@@ -116,20 +102,6 @@ public class ProjectTreeNode extends DefaultMutableTreeNode implements
             return getParent().getRootStructComp();
         else
             return root;
-    }
-
-    public StructComponent getParentUserObject() {
-        if (parent == null)
-            return null;
-        return ((ProjectTreeNode) parent).getUserObject();
-    }
-
-    public boolean containsAnyClasses() {
-        return root.containsAnyClasses();
-    }
-
-    public boolean isPartOfClassPath() {
-        return root.isPartOfClassPath();
     }
 
     @SuppressWarnings("unchecked")

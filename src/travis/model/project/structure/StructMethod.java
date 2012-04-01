@@ -62,12 +62,9 @@ public class StructMethod extends StructComponent {
 
     @Override
     public boolean isMainMethod() {
-        if (getName().equals("main")
+        return getName().equals("main")
                 && descriptor.equals("([Ljava/lang/String;)V") && isStatic()
-                && getVisibility() == Visibility.PUBLIC)
-            return true;
-        else
-            return false;
+                && getVisibility() == Visibility.PUBLIC;
     }
 
     @Override

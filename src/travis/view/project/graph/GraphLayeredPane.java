@@ -29,7 +29,6 @@ public class GraphLayeredPane extends JPanel {
 
     private static final long serialVersionUID = 2855872910533934574L;
 
-    private final JLayeredPane layeredPane;
     private final GraphPanel graph;
     private final GraphTooltip tooltip;
 
@@ -38,7 +37,7 @@ public class GraphLayeredPane extends JPanel {
         this.graph = graph;
         this.tooltip = tooltip;
 
-        layeredPane = new JLayeredPane();
+        JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setOpaque(true);
 
         layeredPane.add(graph, JLayeredPane.DEFAULT_LAYER);

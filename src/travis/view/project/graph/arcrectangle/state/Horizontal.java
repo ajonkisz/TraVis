@@ -32,7 +32,7 @@ import travis.view.project.graph.arcrectangle.LabelledArcRectangle;
 
 public class Horizontal extends TextOrientationState {
 
-    private Arc2D textArc;
+    private final Arc2D textArc;
 
     protected Horizontal(LabelledArcRectangle rect, Font font) {
         super(rect, font);

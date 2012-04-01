@@ -24,6 +24,7 @@ package travis.model.attach;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -81,18 +82,14 @@ public class NewProcess implements Attacher {
         List<String> commands = new ArrayList<String>();
         commands.add("java");
         if (!javaOptions.trim().isEmpty()) {
-            for (String string : javaOptions.trim().split(" ")) {
-                commands.add(string);
-            }
+            Collections.addAll(commands, javaOptions.trim().split(" "));
         }
         commands.add("-Xshare:off");
         commands.add(agentString);
 
         commands.add(main);
         if (!args.trim().isEmpty()) {
-            for (String string : args.trim().split(" ")) {
-                commands.add(string);
-            }
+            Collections.addAll(commands, args.trim().split(" "));
         }
 
         return commands;

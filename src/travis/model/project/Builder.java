@@ -23,7 +23,6 @@ package travis.model.project;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.objectweb.asm.ClassReader;
@@ -35,7 +34,7 @@ import travis.util.Messages;
 public class Builder {
 
     public StructPackage build(File rootDirectory)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         StructPackage root = new StructPackage(Messages.get("default.package"),
                 null);
         getFiles(rootDirectory, root);
@@ -43,14 +42,16 @@ public class Builder {
     }
 
     public StructPackage build() {
-        StructPackage root = new StructPackage(Messages.get("default.package"),
+        return new StructPackage(Messages.get("default.package"),
                 null);
-        return root;
     }
 
     private void getFiles(File rootDirectory, StructPackage parent)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         File[] files = rootDirectory.listFiles();
+        if (files == null) {
+            return;
+        }
 
         for (File file : files) {
             if (file.isHidden()) {

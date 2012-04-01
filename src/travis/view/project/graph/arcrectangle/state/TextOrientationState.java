@@ -37,9 +37,9 @@ public abstract class TextOrientationState {
     private static final int FONT_TO_CENTER_DIVIDER = 3;
     protected static final int MARGIN = 6;
 
-    protected LabelledArcRectangle rect;
-    protected Font font;
-    protected int fontCenterOffset;
+    protected final LabelledArcRectangle rect;
+    protected final Font font;
+    protected final int fontCenterOffset;
     protected double textWidth;
 
     protected TextOrientationState(LabelledArcRectangle rect, Font font) {

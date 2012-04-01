@@ -60,7 +60,6 @@ public class GraphTooltip extends JPanel {
     private volatile String text;
 
     private final LinkedBlockingDeque<SplineData> splines;
-    private final MouseListener mouseListener;
 
     private ExecutionPoint playbackExecutionPoint;
 
@@ -69,9 +68,8 @@ public class GraphTooltip extends JPanel {
         setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
         splines = new LinkedBlockingDeque<SplineData>();
-        mouseListener = new MouseListener();
 
-        addMouseMotionListener(mouseListener);
+        addMouseMotionListener(new MouseListener());
     }
 
     @Override

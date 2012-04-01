@@ -68,7 +68,7 @@ public class ComponentData implements Comparable<ComponentData> {
             }
         }
         if (!morePackages)
-            return max = Math.max(max, getDepth());
+            return Math.max(max, getDepth());
         return max;
     }
 
@@ -222,7 +222,7 @@ public class ComponentData implements Comparable<ComponentData> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ComponentData) {
-            return compareTo((ComponentData) obj) == 0 ? true : false;
+            return compareTo((ComponentData) obj) == 0;
         }
         return false;
     }

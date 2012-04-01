@@ -49,7 +49,6 @@ public class NewProcessPane extends JOptionPane implements ActionListener,
 
     private static final long serialVersionUID = -7968048896714105721L;
 
-    private final JDialog dialog;
     private final Set<String> mains;
 
     private JTextField optionsField;
@@ -68,7 +67,7 @@ public class NewProcessPane extends JOptionPane implements ActionListener,
 
         populatePane();
 
-        dialog = createDialog(UIHelper.getInstance().getMainFrame(),
+        JDialog dialog = createDialog(UIHelper.getInstance().getMainFrame(),
                 Messages.get("new.process"));
 
         dialog.setVisible(true);

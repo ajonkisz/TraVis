@@ -103,7 +103,7 @@ public class AttachersTable extends JPanel {
         tablePanel.removeAll();
         populateHeaders();
 
-        Vector<Attacher> attachers = (Vector<Attacher>) UIHelper.getInstance()
+        Vector<Attacher> attachers = UIHelper.getInstance()
                 .getAttachers();
         for (Attacher attacher : attachers) {
             addRow(attacher);

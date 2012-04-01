@@ -59,7 +59,6 @@ public class TreeRepresentation {
     private Ellipse2D methodCircle;
     private Ellipse2D latestInnerCircle;
     private Ellipse2D[] innerCircles;
-    private int maxPackageDepth;
 
     private int maxHeight;
 
@@ -89,8 +88,9 @@ public class TreeRepresentation {
         Map<StructMethod, Integer> structMethods = tree.getStructMethods();
         if (structMethods == null) {
             methods = new ComponentData[]{};
+        } else {
+            methods = new ComponentData[structMethods.size()];
         }
-        methods = new ComponentData[structMethods.size()];
         for (ComponentData cd : roots) {
             populateRoots(cd, structMethods);
         }
@@ -414,7 +414,7 @@ public class TreeRepresentation {
             for (ComponentData cd : roots) {
                 depth = Math.max(depth, cd.getMaximumPackageDepth());
             }
-            maxPackageDepth = depth;
+            int maxPackageDepth = depth;
             if (depth > 0)
                 depth++;
             if (sets.isDrawingStruct(Settings.STRUCT_CLASS)
